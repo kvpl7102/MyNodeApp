@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const Zipcode = require("./models/zipcode");
 const app = express();
 
 const uri =
