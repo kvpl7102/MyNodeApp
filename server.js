@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const Zipcode = require("./models/zipcode");
+const Zipcode_geojson = require("./models/zipcode_geojson");
 const app = express();
 
 const uri =
@@ -15,6 +16,11 @@ app.get("/", (req, res) => {
 
 // Endpoints to get city and zip code from a given GPS location
 app.get("/location", async (req, res) => {
+  
+  if (!req.query.lat || !req.query.long) {
+    return res.status(400).send({ error: "Missing latitude and/or longitude" });
+  }
+  
   try {
     const { lat, long } = req.query;
     const docs = await Zipcode.find({
@@ -33,6 +39,7 @@ app.get("/location", async (req, res) => {
   }
 });
 
+// Endpoints to get neighbor Zipcode from a given GPS location
 
 
 mongoose.set("strictQuery", false);
