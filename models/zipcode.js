@@ -14,12 +14,18 @@ const ZipcodeSchema = new mongoose.Schema(
       latitude: Number,
       longitude: Number,
     },
+    geoCenter: {
+      type: { type: String, enum: ["Point"], required: true },
+      coordinates: { type: [Number], required: true },
+    },
     market: String,
     id: String,
     timezone: String,
   },
   { strict: false }
 );
+
+ZipcodeSchema.index({ geoCenter: '2dsphere' });
 
 const Zipcode = mongoose.model("Zipcode", ZipcodeSchema, "zipcodes");
 
