@@ -126,9 +126,6 @@ app.post("/neighbors-driving", async (req, res) => {
 
   console.log("drivingDistances length: " + drivingDistances.length,'\n');
 
-  // console.log("drivingDistances[i-1]: " + drivingDistances[262].data.costs[0].distance,'\n');
-  // console.log("drivingDistances[i]: " + drivingDistances[263].data.costs[0].distance,'\n');
-
   // Filter zip codes within the radius
   const zipCodesWithinRadius = potentialZipCodes.filter((zip, i) => {
     return drivingDistances[i] && drivingDistances[i].data && drivingDistances[i].data.costs && drivingDistances[i].data.costs[0] && drivingDistances[i].data.costs[0].distance <= radiusInMeters;
