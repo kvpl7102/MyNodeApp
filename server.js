@@ -96,6 +96,7 @@ async function fetchDrivingDistances(fromCoordinates, toCoordinates) {
 // Endpoints to get neighbor Zipcode based on driving distance from a given GPS location
 app.post("/neighbors-driving", async (req, res) => {
   
+  
   const { lat, long, radius } = req.body;
   if (!lat || !long || !radius) {
     return res.status(400).send({ error: "Missing latitude, longitude, and/or radius" });
