@@ -9,15 +9,22 @@ locationRouter.post("/location", async (req, res) => {
     try {
         const { lat, long } = req.body;
         const docs = await Zipcode.find({
-            "center.latitude": lat,
-            "center.longitude": long,
-        });
-        const result = docs.map((doc) => {
-            return {
-                zipcode: doc.zipcode,
-                city: doc.city,
-            };
-        });
+            geoCenter: {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [parseFloat(long), parseFloat(lat)]
+                    }
+                }
+            }
+        }).limit(1);
+        if (docs.length === 0) {
+            return res.status(404).send({ error: "No zipcode found for this location" });
+        }
+        const result = {
+            zipcode: docs[0].zipcode,
+            city: docs[0].city,
+        };
         res.send(result);
     }
     catch (err) {

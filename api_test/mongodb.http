@@ -37,7 +37,16 @@ Content-Type: application/json
 {
   "lat": 34.0762187,
   "long": -118.3109634,
-  "radius": 5
+  "radius": 20
 }
 
 
+
+###
+POST https://traffic.wearewarp.link/traffic
+Content-Type: application/json
+
+{
+  "from": [[34.0659747, -118.2386422],[34.0609873, -118.2998843]],
+  "to": [[34.0593736, -118.3089617],[34.0530983,-118.2645052]]
+}
