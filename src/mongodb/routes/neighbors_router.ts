@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const neighborsRouter = express.Router();
 import { Zipcode } from '../models/zipcode_model.js';
+// import { ZipcodeGeoJSON } from '../models/zipcodegeojson_model.js';
 
 // Endpoints to get neighbor Zipcode based on flight distance from a given GPS location
 neighborsRouter.post("/neighbors-flight", async (req, res) => {

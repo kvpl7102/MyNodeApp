@@ -67,7 +67,13 @@ neighborsRouter.post("/neighbors-driving", async (req, res) => {
             from: from,
             to: to
         });
-        drivingDistances = drivingDistances.concat(response.data.costs.map((cost) => cost.distance));
+        // console.log(response.data.costs);
+        // drivingDistances = drivingDistances.concat(response.data.costs.map((cost: { distance: any; }) => cost.distance));
+        if (response && response.data && response.data.costs) {
+            drivingDistances = drivingDistances.concat(response.data.costs
+                .filter((cost) => cost != null)
+                .map((cost) => cost.distance));
+        }
     }
     // Filter zip codes within the radius
     const zipCodesWithinRadius = potentialZipCodes.filter((zip, i) => {

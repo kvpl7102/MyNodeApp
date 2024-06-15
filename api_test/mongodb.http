@@ -14,19 +14,9 @@ Content-Type: application/json
 
 [
   {
-    "lat": 33.9978617,
-    "long": -118.3936166,
-    "radius": 5
-  },
-  {
-    "lat": 34.0522,
-    "long": -118.2437,
-    "radius": 3
-  },
-  {
-    "lat": 33.891769,
-    "long": -118.297006,
-    "radius": 2
+    "lat": 33.941916,
+    "long": -118.265087,
+    "radius": 1.5
   }
 ]
 
@@ -35,9 +25,9 @@ POST http://localhost:8080/neighbors-driving
 Content-Type: application/json
 
 {
-  "lat": 34.0762187,
-  "long": -118.3109634,
-  "radius": 20
+  "lat": 33.941916,
+  "long": -118.265087,
+  "radius": 1.7
 }
 
 
