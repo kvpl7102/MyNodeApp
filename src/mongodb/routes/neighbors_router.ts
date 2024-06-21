@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const neighborsRouter = express.Router();
 import { Zipcode } from '../models/zipcode_model.js';
-// import { ZipcodeGeoJSON } from '../models/zipcodegeojson_model.js';
+import { ZipcodeGeoJSON } from '../models/zipcodegeojson_model.js';
 
 // Endpoints to get neighbor Zipcode based on flight distance from a given GPS location
 neighborsRouter.post("/neighbors-flight", async (req, res) => {
@@ -53,30 +53,47 @@ neighborsRouter.post("/neighbors-flight", async (req, res) => {
 
 // Endpoints to get neighbor Zipcode based on driving distance from a given GPS location
 neighborsRouter.post("/neighbors-driving", async (req, res) => {
+  
   const { lat, long, radius } = req.body;
   if (!lat || !long || !radius) {
     return res.status(400).send({ error: "Missing latitude, longitude, and/or radius" });
   }
-
+  
   const radiusInMeters = radius * 1609.34; // Convert miles to meters
 
-  // Find potential zip codes within a larger radius to account for driving distance
-  const potentialZipCodes = await Zipcode.find({
-    geoCenter: {
-      $nearSphere: {
-        $geometry: {
-          type: "Point",
-          coordinates: [parseFloat(long), parseFloat(lat)]
-        },
-        $maxDistance: radiusInMeters
+  // console.time("fetchZipcodes");
+  const potentialZipCodes = await ZipcodeGeoJSON.aggregate([
+    {
+        $project: {
+          _id: 0,
+          center: 1,
+          zipcode: 1,
+          geojson: 1
+        }
       }
-    }
-  });
+  ]);
+  // console.timeEnd("fetchZipcodes");
 
-  // Calculate driving distances of potential zip codes
+  // Find potential zip codes within a larger radius to account for driving distance
+  // const potentialZipCodes = await Zipcode.find({
+  //   geoCenter: {
+  //     $nearSphere: {
+  //       $geometry: {
+  //         type: "Point",
+  //         coordinates: [parseFloat(long), parseFloat(lat)]
+  //       },
+  //       $maxDistance: radiusInMeters
+  //     }
+  //   }
+  // });
+
+  /*
+    Determine if at least one point in the zipcode area is within the radius of the given GPS location  
+  */
   let drivingDistances: any[] = [];
-  for (let i = 0; i < potentialZipCodes.length; i += 100) {
-    const batch = potentialZipCodes.slice(i, i + 100);
+  let batchLength = 100;
+  for (let i = 0; i < potentialZipCodes.length; i += batchLength) {
+    const batch = potentialZipCodes.slice(i, i + batchLength);
     const from = Array(batch.length).fill([lat, long]);
     const to = batch.map(zip => [zip.center.latitude, zip.center.longitude]);
 
@@ -85,14 +102,10 @@ neighborsRouter.post("/neighbors-driving", async (req, res) => {
       to: to
     });
 
-    // console.log(response.data.costs);
-    // drivingDistances = drivingDistances.concat(response.data.costs.map((cost: { distance: any; }) => cost.distance));
+
     if (response && response.data && response.data.costs) {
-      drivingDistances = drivingDistances.concat( response.data.costs
-                                                .filter((cost: { distance: any; }) => cost != null)
-                                                .map((cost: { distance: any; }) => cost.distance)
-    );
-}
+      drivingDistances = drivingDistances.concat( response.data.costs.filter((cost: { distance: any; }) => cost != null).map((cost: { distance: any; }) => cost.distance));
+    }
   }
 
   // Filter zip codes within the radius
@@ -102,12 +115,35 @@ neighborsRouter.post("/neighbors-driving", async (req, res) => {
 
   // Extract the zip code and city from the results
   const result = zipCodesWithinRadius.map(zip => ({
-    zipcode: zip.zipcode,
-    city: zip.city
+    zipcode: zip.zipcode
   }));
+
+
+  /*
+    Determine if all points in the zipcode area are inside the radius of the given GPS location 
+  */ 
+  let drivingDistancesAll: any[] = [];
+  for (let i = 0; i < potentialZipCodes.length; i += batchLength) {
+    const batch = potentialZipCodes.slice(i, i + batchLength);
+    const from = Array(batch.length).fill([lat, long]);
+    const bottomLeft = batch.map(zip => [zip.geojson.bbox[1], zip.geojson.bbox[0]]);
+    const topRight = batch.map(zip => [zip.geojson.bbox[3], zip.geojson.bbox[2]]);
+
+    const responseBottomleft = await axios.post('https://traffic.wearewarp.link/traffic', {
+      from: from,
+      to: bottomLeft
+    });
+
+    if (responseBottomleft && responseBottomleft.data && responseBottomleft.data.costs) {
+      drivingDistancesAll = drivingDistancesAll.concat( responseBottomleft.data.costs.filter((cost: { distance: any; }) => cost != null).map((cost: { distance: any; }) => cost.distance));
+    }
+
+  }
 
   // Send the response
   res.send(result);
 })
+
+
 
 export { neighborsRouter };

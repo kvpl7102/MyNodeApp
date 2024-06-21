@@ -35,7 +35,7 @@ const GeoJsonSchema: Schema = new Schema({
       required: true
     },
     coordinates: {
-      type: [[[Number]]], // Array of arrays of arrays of numbers
+      type: [[[Number]]], 
       required: true
     },
     bbox: [Number]
@@ -59,4 +59,6 @@ const ZipcodeGeoJSONSchema: Schema = new Schema({
   geojson: GeoJsonSchema
 });
 
-const Zipcode = mongoose.model<IZipcode>('ZipcodeGeoJSON', ZipcodeGeoJSONSchema, 'zipcodes_geojson');
+const ZipcodeGeoJSON = mongoose.model<IZipcode>('ZipcodeGeoJSON', ZipcodeGeoJSONSchema, 'zipcodes_geojson');
+
+export { ZipcodeGeoJSON };
