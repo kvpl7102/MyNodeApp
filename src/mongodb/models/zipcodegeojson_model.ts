@@ -6,8 +6,8 @@ interface IGeoJson {
   geometry: {
     type: string;
     coordinates: number[][];
-    bbox: number[];
   };
+  bbox: number[];
 }
 
 interface IZipcode extends Document {
@@ -37,9 +37,9 @@ const GeoJsonSchema: Schema = new Schema({
     coordinates: {
       type: [[[Number]]], 
       required: true
-    },
-    bbox: [Number]
-  }
+    }
+  },
+  bbox: [Number]
 });
 
 GeoJsonSchema.index({ geometry: '2dsphere' });

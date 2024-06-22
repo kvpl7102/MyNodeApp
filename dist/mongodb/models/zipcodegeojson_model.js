@@ -9,14 +9,14 @@ const GeoJsonSchema = new Schema({
             required: true
         },
         coordinates: {
-            type: [[[Number]]], // Array of arrays of arrays of numbers
+            type: [[[Number]]],
             required: true
-        },
-        bbox: [Number]
-    }
+        }
+    },
+    bbox: [Number]
 });
 GeoJsonSchema.index({ geometry: '2dsphere' });
-const ZipcodeSchema = new Schema({
+const ZipcodeGeoJSONSchema = new Schema({
     _id: {
         $oid: String
     },
@@ -30,5 +30,6 @@ const ZipcodeSchema = new Schema({
     zipcode: String,
     geojson: GeoJsonSchema
 });
-const Zipcode = mongoose.model('Zipcode', ZipcodeSchema, 'zipcodes_geojson');
+const ZipcodeGeoJSON = mongoose.model('ZipcodeGeoJSON', ZipcodeGeoJSONSchema, 'zipcodes_geojson');
+export { ZipcodeGeoJSON };
 //# sourceMappingURL=zipcodegeojson_model.js.map

@@ -21,14 +21,13 @@ Content-Type: application/json
 ]
 
 ###
-POST http://localhost:8080/neighbors-driving
+POST http://localhost:8080/neighbors-driving?mode=all
 Content-Type: application/json
 
 {
   "lat": 33.941916,
   "long": -118.265087,
-  "radius": 2
-
+  "radius": 5
 }
 
 ###
